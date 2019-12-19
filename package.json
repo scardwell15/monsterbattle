@@ -4,7 +4,7 @@
   "description": "Pokemon app",
   "main": "app.js",
   "scripts": {
-    "test": "node test.js"
+    "test": "node test/tests_db.js"
   },
   "author": "",
   "license": "ISC",

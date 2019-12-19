@@ -40,10 +40,10 @@ const profileInterface = new GraphQLObjectType({
 });
 
 //NOTE: best practice for this is per session.
-const userLoaderByName = new DataLoader(
-    usernames => knex.select("profiles.user_id", "username", "password", "battles", "wins", "current_pokemon.pokemon_id").from("profiles")
+const getProfileLoaderByName = new DataLoader(
+    usernames => knex.select("profile.user_id", "username", "password", "battles", "wins", "current_pokemon.pokemon").from("profile")
         .leftJoin("current_pokemon", function() {
-            this.on('current_pokemon.user_id', '=', 'profiles.user_id')
+            this.on('current_pokemon.owner', '=', 'profile.user_id')
         }).whereIn("username", usernames)
         .then(rows => usernames.map(username => rows.filter(user => user.username === username)))
 )
@@ -52,6 +52,7 @@ async function getUserByName(username, loader) {
     const rows = await loader.load(username)
     if(rows.length > 0) {
         var target = rows[0] //select first one, all of them have the same data.. except pokemon_id.
+
         var newProfile = new Profile()
         newProfile.username = target.username
         newProfile.password = target.password
@@ -60,10 +61,19 @@ async function getUserByName(username, loader) {
         newProfile.wins = target.wins
         newProfile.current_pokemon = []
         for(let i = 0; i < rows.length; i++) {
-            newProfile.current_pokemon.push(rows[i].pokemon_id)
+            newProfile.current_pokemon.push(rows[i].pokemon)
         }
+
         return newProfile
     }
 }
 
-module.exports = {profileInterface, getUserByName, userLoaderByName}
+async function createNewUser(username, password) {
+    await knex.insert({ username: username,
+                        password: password,
+                        battles: 0,
+                        wins: 0
+                    }).into("profile")
+}
+
+module.exports = {profileInterface, getUserByName, getProfileLoaderByName, createNewUser}
