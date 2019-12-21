@@ -10,18 +10,24 @@
   "license": "ISC",
   "dependencies": {
     "@types/chai": "^4.2.7",
+    "@types/express-session": "^1.15.16",
     "@types/inquirer": "^6.5.0",
     "@types/mocha": "^5.2.7",
+    "@types/ms": "^0.7.31",
     "@types/node": "^12.12.21",
     "chai": "^4.2.0",
     "commander": "^4.0.1",
     "dataloader": "^2.0.0",
+    "express-session": "^1.17.0",
     "graphql": "^14.5.8",
+    "graphql-yoga": "^1.18.3",
     "inquirer": "^7.0.1",
     "knex": "^0.20.4",
     "mocha": "^6.2.2",
+    "ms": "^2.1.2",
     "pg": "^7.15.1",
     "ts-node": "^8.5.4",
-    "typescript": "^3.7.3"
+    "typescript": "^3.7.3",
+    "uuid": "^3.3.3"
   }
 }

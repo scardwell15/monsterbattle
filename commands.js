@@ -28,3 +28,10 @@ function displayCLI() {
 }
 
 module.exports = {displayCLI, addCLIFunc, runPrompts, runFunctions}
+
+//require all files in cli_commands
+var normalizedPath = require("path").join(__dirname, "cli_commands");
+
+require("fs").readdirSync(normalizedPath).forEach(function(file) {
+  require("./cli_commands/" + file);
+});

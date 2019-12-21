@@ -6,7 +6,17 @@ const {GraphQLObjectType,
 
 const DataLoader = require("dataloader")
 const { knex } = require("../db.js")
-const Profile = require("../types/profile.ts")
+
+class Profile {
+    user_id
+    username
+    password
+    battles
+    wins
+    current_pokemon
+    constructor() {
+    }
+}
 
 const profileInterface = new GraphQLObjectType({
     name: 'Profile',
@@ -39,7 +49,8 @@ const profileInterface = new GraphQLObjectType({
     })
 });
 
-//NOTE: best practice for this is per session.
+//NOTE: best practice for loaders is per session. they cache a LOT of data so using the same one for too long is bad.
+//the join gets all of the rows that match the user ID inside the current pokemon table.
 const getProfileLoaderByName = new DataLoader(
     usernames => knex.select("profile.user_id", "username", "password", "battles", "wins", "current_pokemon.pokemon").from("profile")
         .leftJoin("current_pokemon", function() {
@@ -48,10 +59,16 @@ const getProfileLoaderByName = new DataLoader(
         .then(rows => usernames.map(username => rows.filter(user => user.username === username)))
 )
 
-async function getUserByName(username, loader) {
-    const rows = await loader.load(username)
+//logged in users
+var database = []
+
+async function getUserByName(username) {
+    if(database[username]) {
+        return database[username]
+    }
+    const rows = await getProfileLoaderByName.load(username) //the loader returns a list of rows.
     if(rows.length > 0) {
-        var target = rows[0] //select first one, all of them have the same data.. except pokemon_id.
+        var target = rows[0] //select first one. all of them have the same data.. except pokemon_id.
 
         var newProfile = new Profile()
         newProfile.username = target.username
@@ -60,7 +77,7 @@ async function getUserByName(username, loader) {
         newProfile.battles = target.battles
         newProfile.wins = target.wins
         newProfile.current_pokemon = []
-        for(let i = 0; i < rows.length; i++) {
+        for(let i = 0; i < rows.length; i++) { //this puts the data into our new object.
             newProfile.current_pokemon.push(rows[i].pokemon)
         }
 
@@ -68,6 +85,7 @@ async function getUserByName(username, loader) {
     }
 }
 
+//create a new user
 async function createNewUser(username, password) {
     await knex.insert({ username: username,
                         password: password,
@@ -76,4 +94,22 @@ async function createNewUser(username, password) {
                     }).into("profile")
 }
 
-module.exports = {profileInterface, getUserByName, getProfileLoaderByName, createNewUser}
+async function login(username, password, context) {
+    const profile = await getUserByName(username)
+    if(profile == null) {
+        console.log("Bad profile")
+        return
+    }
+
+    if(password !== profile.password) {
+        console.log("Bad password")
+        return
+    }
+
+    console.log("Password matched")
+    context.req.session.user = username
+    database[username] = profile
+    return {username: username} //return username to signal success
+}
+
+module.exports = {profileInterface, getUserByName, getProfileLoaderByName, createNewUser, login}
