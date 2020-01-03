@@ -98,18 +98,17 @@ async function login(username, password, context) {
     const profile = await getUserByName(username)
     if(profile == null) {
         console.log("Bad profile")
-        return
+        return {result: 1}
     }
 
     if(password !== profile.password) {
         console.log("Bad password")
-        return
+        return {result: 2}
     }
 
     console.log("Password matched")
-    context.req.session.user = username
     database[username] = profile
-    return {username: username} //return username to signal success
+    return {result: 0, username: username} //return username to signal success
 }
 
 module.exports = {profileInterface, getUserByName, getProfileLoaderByName, createNewUser, login}

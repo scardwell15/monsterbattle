@@ -18,6 +18,8 @@
     "chai": "^4.2.0",
     "commander": "^4.0.1",
     "dataloader": "^2.0.0",
+    "express": "^4.17.1",
+    "express-async-handler": "^1.1.4",
     "express-session": "^1.17.0",
     "graphql": "^14.5.8",
     "graphql-yoga": "^1.18.3",
@@ -27,7 +29,6 @@
     "ms": "^2.1.2",
     "pg": "^7.15.1",
     "ts-node": "^8.5.4",
-    "typescript": "^3.7.3",
-    "uuid": "^3.3.3"
+    "typescript": "^3.7.3"
   }
 }
