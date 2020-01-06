@@ -21,7 +21,7 @@ program.command("run-server")
     .action(() => {
         const opts = {
             port: 4000, //what port to run graphiQL on
-            playground: true, //set to false to disable graphiQL
+            //playground: true, //set to false to disable graphiQL
             cors: {
                 credentials: true,
                 origin: ['http://localhost:8080'] //front end url
