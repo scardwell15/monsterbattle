@@ -1,4 +1,5 @@
 const program = require("commander")
+const path = require("path")
 
 const session = require("express-session");
 const asyncHandler = require("express-async-handler")
@@ -54,6 +55,8 @@ program.command("run-server")
                 if(result == 0) {
                     req.session.user = username
                 }
+          })).get(asyncHandler(async (req, res) => {
+                res.sendFile(path.join(__dirname + "/test.html"))
           }))
 
           //start server
