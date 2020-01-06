@@ -8,6 +8,6 @@ CREATE TABLE profile(
 
 CREATE TABLE current_pokemon(
 	unique_id SERIAL PRIMARY KEY,
-	user_id SERIAL REFERENCES profiles(user_id),
+	user_id SERIAL REFERENCES profile(user_id),
 	pokemon_id INT
 );
